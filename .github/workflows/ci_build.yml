@@ -19,7 +19,7 @@ jobs:
     - name: Build and push Docker image
       run: |
         echo "Building Docker image..."
-        docker build -t ghcr.io/${{ github.repository_owner }}/my-app:latest -f ./CI_test_docker/Dockerfile
+        docker build -t ghcr.io/${{ github.repository_owner }}/my-app:latest .
         echo "Pushing Docker image..."
         docker push ghcr.io/${{ github.repository_owner }}/my-app:latest
 
