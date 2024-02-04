@@ -1,0 +1,13 @@
+name: CI_test
+
+on: [pull_request]
+jobs:
+  test: # ジョブ名
+    runs-on: ubuntu-latest # このジョブが実行される仮想環境
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a script
+      run: |
+        echo Hello, world!
+        echo Add other commands here
+        echo This is a multi-line script

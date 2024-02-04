@@ -1,0 +1,46 @@
+name: CI_build_and_test
+
+on: [push, pull_request]
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.CR_PAT }}
+
+    - name: Build and push Docker image
+      run: |
+        echo "Building Docker image..."
+        docker build -t ghcr.io/${{ github.repository_owner }}/my-app:latest -f ./CI_test_docker/Dockerfile
+        echo "Pushing Docker image..."
+        docker push ghcr.io/${{ github.repository_owner }}/my-app:latest
+
+        echo "List of Docker images:"
+        docker images
+  test:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.CR_PAT }}
+
+    - name: Pull and test Docker image
+      run: |
+        echo "Pulling Docker image..."
+        docker pull ghcr.io/${{ github.repository_owner }}/my-app:latest
+        echo "Testing Docker image..."
+        docker run --rm ghcr.io/${{ github.repository_owner }}/my-app:latest python -c "import numpy as np; print(np.zeros((2,3))); print('Imports successful')"
+
